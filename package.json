@@ -1,0 +1,25 @@
+{
+  "name": "tts-app",
+  "version": "1.0.0",
+  "description": "A Text-to-Speech application using Eleven Labs API or a free alternative.",
+  "main": "src/js/app.js",
+  "scripts": {
+    "build": "tailwindcss build src/css/styles.css -o dist/styles.css",
+    "start": "live-server"
+  },
+  "dependencies": {
+    "axios": "^0.21.1",
+    "tailwindcss": "^2.2.19"
+  },
+  "devDependencies": {
+    "live-server": "^1.2.1"
+  },
+  "keywords": [
+    "text-to-speech",
+    "tts",
+    "eleven-labs",
+    "api"
+  ],
+  "author": "",
+  "license": "ISC"
+}

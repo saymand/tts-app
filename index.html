@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TTS App</title>
+
+    <script src="https://cdn.tailwindcss.com/"></script>
+    <link rel="stylesheet" href="/src/css/styles.css">
+</head>
+<body class="bg-[#fa87d4] flex flex-col items-center justify-center min-h-screen p-4">
+    <h1 class="text-3xl font-bold mb-4">:-)))))Skibidi Rizzler Sigma Ohio((((((((-:</h1>
+    
+    <div class="flex mb-4 bg-white rounded-t-lg overflow-hidden">
+        <button id="tab-front" class="tab-btn bg-blue-500 text-white px-4 py-2 flex-1">Sigma Zone</button>
+        <button id="tab-middle" class="tab-btn bg-gray-200 text-gray-700 px-4 py-2 flex-1">Skibidi Territory</button>
+        <button id="tab-back" class="tab-btn bg-gray-200 text-gray-700 px-4 py-2 flex-1">Gyatt Chamber</button>
+    </div>
+
+    <div class="bg-white p-4 rounded-b-lg w-full max-w-2xl">
+        <div id="content-front" class="tab-content">
+            <h2 class="text-xl font-bold mb-2">Sigma Zone</h2>
+            <div class="grid grid-cols-1 gap-2">
+                <button class="read-btn bg-blue-500 text-white px-4 py-3 rounded w-full" data-row="1">Sigma Grindset</button>
+                <button class="read-btn bg-blue-500 text-white px-4 py-3 rounded w-full" data-row="2">Rizz Master</button>
+                <button class="read-btn bg-blue-500 text-white px-4 py-3 rounded w-full" data-row="3">Gigachad Energy</button>
+            </div>
+        </div>
+        
+        <div id="content-middle" class="tab-content hidden">
+            <h2 class="text-xl font-bold mb-2">Skibidi Territory</h2>
+            <div class="grid grid-cols-1 gap-2">
+                <button class="read-btn bg-blue-500 text-white px-4 py-3 rounded w-full" data-row="4">Skibidi Toilet</button>
+                <button class="read-btn bg-blue-500 text-white px-4 py-3 rounded w-full" data-row="5">Camera Man</button>
+                <button class="read-btn bg-blue-500 text-white px-4 py-3 rounded w-full" data-row="6">Ohio Moment</button>
+                <button class="read-btn bg-blue-500 text-white px-4 py-3 rounded w-full" data-row="7">No Cap Frfr</button>
+            </div>
+        </div>
+        
+        <div id="content-back" class="tab-content hidden">
+            <h2 class="text-xl font-bold mb-2">Gyatt Chamber</h2>
+            <div class="grid grid-cols-1 gap-2">
+                <button class="read-btn bg-blue-500 text-white px-4 py-3 rounded w-full" data-row="8">Gyatt Damn</button>
+                <button class="read-btn bg-blue-500 text-white px-4 py-3 rounded w-full" data-row="9">Bussin FR</button>
+                <button class="read-btn bg-blue-500 text-white px-4 py-3 rounded w-full" data-row="10">Backrooms Vibe</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white p-4 rounded-lg w-full max-w-2xl mt-4">
+        <h2 class="text-xl font-bold mb-2">Voice Settings</h2>
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Select Voice</label>
+            <select id="voiceSelect" class="border border-gray-300 rounded px-4 py-2 w-full bg-white">
+                <option value="">Loading voices...</option>
+            </select>
+        </div>
+    </div>
+    
+    <div class="bg-white p-4 rounded-lg w-full max-w-2xl mt-4">
+        <h2 class="text-xl font-bold mb-2">Special Buttons</h2>
+        <div class="grid grid-cols-2 gap-2">
+            <button id="piButton" class="bg-green-600 text-white px-4 py-3 rounded w-full">Read Pi</button>
+            <button id="wikiButton" class="bg-yellow-600 text-white px-4 py-3 rounded w-full">Random Wikipedia</button>
+        </div>
+    </div>
+    
+    <div class="bg-white p-4 rounded-lg w-full max-w-2xl mt-4">
+        <h2 class="text-xl font-bold mb-2">Custom Text</h2>
+        <div class="flex flex-col gap-2">
+            <input type="text" id="customText" placeholder="Enter text to speak..." class="border border-gray-300 rounded px-4 py-2 w-full">
+            <div id="errorMessage" class="text-red-500 text-sm hidden">Sorry, inappropriate content detected.</div>
+            <button id="customReadBtn" class="bg-purple-500 text-white px-4 py-2 rounded w-full">Speak Custom Text</button>
+        </div>
+    </div>
+    
+    <div class="mt-4">
+        <button id="stopButton" class="bg-red-500 text-white px-4 py-2 rounded">Stop</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            let isSpeaking = false;
+            let currentUtterance = null;
+            let voices = [];
+            const voiceSelect = document.getElementById('voiceSelect');
+            
+            // Pi digits (first 100 digits)
+            const piDigits = "3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679";
+            
+            // Random Wikipedia topics
+            const wikiTopics = [
+                "The Amazon Rainforest is Earth's largest tropical rainforest, covering over 5.5 million square kilometers.",
+                "The Great Barrier Reef is the world's largest coral reef system, visible from outer space.",
+                "The Eiffel Tower was originally built as a temporary exhibit for the 1889 World's Fair.",
+                "Mount Everest grows about 4 millimeters taller every year due to geological forces.",
+                "The human brain contains approximately 86 billion neurons.",
+                "Octopuses have three hearts, blue blood, and nine brains.",
+                "The first computer programmer was Ada Lovelace, who worked on Charles Babbage's Analytical Engine in the 1840s.",
+                "The first video game was created in 1958 called 'Tennis for Two'.",
+                "The fastest land animal is the cheetah, which can reach speeds of up to 75 miles per hour."
+            ];
+            
+            // Load and populate voice options
+            function populateVoices() {
+                voices = window.speechSynthesis.getVoices();
+                voiceSelect.innerHTML = '';
+                
+                if (voices.length === 0) {
+                    voiceSelect.innerHTML = '<option value="">No voices available</option>';
+                    return;
+                }
+                
+                voices.forEach((voice, index) => {
+                    const option = document.createElement('option');
+                    option.value = index;
+                    option.textContent = `${voice.name} (${voice.lang})`;
+                    voiceSelect.appendChild(option);
+                });
+            }
+            
+            // Initialize voices
+            populateVoices();
+            
+            // Chrome needs to wait for voices to load
+            if (window.speechSynthesis.onvoiceschanged !== undefined) {
+                window.speechSynthesis.onvoiceschanged = populateVoices;
+            }
+            
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    tabButtons.forEach(btn => {
+                        btn.classList.remove('bg-blue-500', 'text-white');
+                        btn.classList.add('bg-gray-200', 'text-gray-700');
+                    });
+                    
+                    tabContents.forEach(content => {
+                        content.classList.add('hidden');
+                    });
+                    
+                    button.classList.remove('bg-gray-200', 'text-gray-700');
+                    button.classList.add('bg-blue-500', 'text-white');
+                    
+                    const contentId = 'content-' + button.id.split('-')[1];
+                    document.getElementById(contentId).classList.remove('hidden');
+                });
+            });
+
+            const readButtons = document.querySelectorAll('.read-btn');
+            const stopButton = document.getElementById('stopButton');
+            const customReadBtn = document.getElementById('customReadBtn');
+            const customText = document.getElementById('customText');
+            const errorMessage = document.getElementById('errorMessage');
+            const piButton = document.getElementById('piButton');
+            const wikiButton = document.getElementById('wikiButton');
+            
+            // List of inappropriate words to filter
+            const inappropriateWords = [
+                'slur', 'racist', 'hate', 'nazi', 'offensive',
+                // Add more words to filter as needed
+            ];
+            
+            function containsInappropriateContent(text) {
+                text = text.toLowerCase();
+                return inappropriateWords.some(word => text.includes(word));
+            }
+            
+            function resetButtonStyle(button) {
+                if (button.classList.contains('read-btn')) {
+                    button.classList.remove('bg-green-500');
+                    button.classList.add('bg-blue-500');
+                } else if (button === customReadBtn) {
+                    button.classList.remove('bg-green-500');
+                    button.classList.add('bg-purple-500');
+                } else if (button === piButton) {
+                    button.classList.remove('bg-green-700');
+                    button.classList.add('bg-green-600');
+                } else if (button === wikiButton) {
+                    button.classList.remove('bg-yellow-700');
+                    button.classList.add('bg-yellow-600');
+                }
+            }
+            
+            function speakText(text, button = null) {
+                // Stop any current speech
+                window.speechSynthesis.cancel();
+                
+                const utterance = new SpeechSynthesisUtterance(text);
+                
+                // Set selected voice
+                const selectedVoiceIndex = voiceSelect.value;
+                if (selectedVoiceIndex !== '' && voices[selectedVoiceIndex]) {
+                    utterance.voice = voices[selectedVoiceIndex];
+                }
+                
+                currentUtterance = utterance;
+                
+                utterance.onend = function() {
+                    if (button) resetButtonStyle(button);
+                    currentUtterance = null;
+                };
+
+                utterance.onerror = function() {
+                    if (button) resetButtonStyle(button);
+                    currentUtterance = null;
+                };
+                
+                window.speechSynthesis.speak(utterance);
+            }
+            
+            readButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const textToSpeak = button.textContent;
+                    
+                    button.classList.remove('bg-blue-500');
+                    button.classList.add('bg-green-500');
+                    
+                    speakText(textToSpeak, button);
+                });
+            });
+            
+            piButton.addEventListener('click', () => {
+                piButton.classList.remove('bg-green-600');
+                piButton.classList.add('bg-green-700');
+                
+                speakText("Pi equals " + piDigits, piButton);
+            });
+            
+            wikiButton.addEventListener('click', () => {
+                wikiButton.classList.remove('bg-yellow-600');
+                wikiButton.classList.add('bg-yellow-700');
+                
+                // Get a random Wikipedia topic
+                const randomIndex = Math.floor(Math.random() * wikiTopics.length);
+                const randomTopic = wikiTopics[randomIndex];
+                
+                speakText(randomTopic, wikiButton);
+            });
+            
+            customReadBtn.addEventListener('click', () => {
+                const textToSpeak = customText.value.trim();
+                
+                if (!textToSpeak) return;
+                
+                if (containsInappropriateContent(textToSpeak)) {
+                    errorMessage.classList.remove('hidden');
+                    return;
+                }
+                
+                errorMessage.classList.add('hidden');
+                customReadBtn.classList.remove('bg-purple-500');
+                customReadBtn.classList.add('bg-green-500');
+                
+                speakText(textToSpeak, customReadBtn);
+            });
+            
+            customText.addEventListener('input', () => {
+                errorMessage.classList.add('hidden');
+            });
+            
+            stopButton.addEventListener('click', () => {
+                window.speechSynthesis.cancel();
+                
+                // Reset all buttons
+                readButtons.forEach(btn => resetButtonStyle(btn));
+                resetButtonStyle(customReadBtn);
+                resetButtonStyle(piButton);
+                resetButtonStyle(wikiButton);
+                
+                currentUtterance = null;
+            });
+        });
+    </script>
+</body>
+</html>
